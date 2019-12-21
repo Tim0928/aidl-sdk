@@ -1,0 +1,64 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.jfrog.artifactory'
+apply plugin: 'maven-publish'
+
+def libraryGroupId = 'com.rextron.sdk'
+def libraryArtifactId = 'rextron-sdk'
+def libraryVersionCode = 10000
+def libraryVersion = '1.0.0'
+
+android {
+    compileSdkVersion 29
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 29
+        versionCode libraryVersionCode
+        versionName libraryVersion
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        setProperty("archivesBaseName", "avccamera-sdk-$versionName")
+        consumerProguardFiles 'consumer-proguard-rules.pro'
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+}
+publishing {
+    publications {
+        aar(MavenPublication) {
+            groupId libraryGroupId
+            version libraryVersion
+            artifactId libraryArtifactId
+
+            artifact("$buildDir/outputs/aar/${artifactId}-${libraryVersion}-release.aar")
+        }
+    }
+}
+ext {
+    bintrayRepo = "aidltest"                                         //  你上传的位于bintray中的Repository名称
+    publishedGroupId = 'com.rextron.aidlaarserver'                                   //  填写groupId， 一般是包名，比如：com.android.support
+    libName = 'aidl-sdk'                                             //  如果不填写，就使用module名称
+    versionName = '1.0.0'                                               //  版本号，比如：22.2.1
+    //vcsUrl = 'https://github.com/andforce/AsyncOkHttp.git'              //  可以填写github上库的地址.
+    //licenseName = 'Apache-2.0'                                          //  支持的协议请看
+
+    // 下面这些都是选填字段
+    //libraryPackaging = 'jar'                                              //  如果是'com.android.library'默认上传aar, 如果是'java-library'默认上传jar
+    //libraryDesc = 'A OkHttp Library'                                      //  库的描述
+    //websiteUrl = 'https://github.com/andforce/AsyncOkHttp'                //  可以填写github上的库地址.
+    //issueTrackerUrl = 'https://github.com/andforce/AsyncOkHttp/issues'    //  可以填写github库的issue地址.
+    //libraryVersionDesc = 'version descriotion'                            //  版本描述
+}
+
+apply from: 'https://raw.githubusercontent.com/andforce/bintray-jcenter-maven-central/master/jcenter.gradle'
